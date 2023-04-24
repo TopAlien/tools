@@ -1,0 +1,73 @@
+import OverlayScrollbars from 'overlayscrollbars'
+
+const extractProp = prop => obj =>
+  typeof obj === 'undefined' ? undefined : obj[prop]
+const extractOptions = extractProp('options')
+const extractEl = extractProp('el')
+
+/**
+ * 使用
+ *
+ * 指定挂载dom，目前用在table不在同一级
+ * v-scrollbar="{ el: '.ant-table-body' }"
+ *
+ * v-scrollbar.x="{ options: { overflowBehavior : {  y : "hidden" } } } 配置滚动方向 - x轴滚动
+ *
+ * v-scrollbar.x - 只x轴滚动
+ *
+ * v-scrollbar - 只y轴滚动 { 默认y轴 }
+ * v-scrollbar.y - 只y轴滚动
+ *
+ * v-scrollbar.x.y 双轴滚动
+ */
+const bestMatch = extractor => possibilities =>
+  extractor(possibilities.find(p => typeof extractor(p) !== 'undefined'))
+
+const bestEl = bestMatch(extractEl)
+const bestOptions = bestMatch(extractOptions)
+
+export default {
+  install(Vue, options) {
+    Vue.directive('scrollbar', {
+      // vue3 使用 mounted, 这里的dom可能未挂载到
+      inserted(el, binding) {
+        const possibilities = [binding.value, options]
+        const targetEl = bestEl(possibilities)
+        const config = bestOptions(possibilities)
+
+        const scrollY = binding.modifiers.y
+        const scrollX = binding.modifiers.x
+
+        OverlayScrollbars(targetEl ? document.querySelector(targetEl) : el, {
+          scrollbars: { autoHide: 'scroll' },
+          overflowBehavior: {
+            x: scrollX ? 'scroll' : 'hidden',
+            y: scrollX && !scrollY ? 'hidden' : 'scroll'
+          },
+          ...config
+        })
+
+        el.dispatchEvent(new CustomEvent('insert', { detail: el }))
+      },
+      componentUpdated(el, binding) {
+        const possibilities = [binding.value, options]
+        const targetEl = bestEl(possibilities)
+        // 如果实例存在，会返回当前实例且同配置
+        const scrollbar = OverlayScrollbars(
+          targetEl ? document.querySelector(targetEl) : el
+        )
+        scrollbar && scrollbar.update()
+      },
+      unbind(el, binding) {
+        const possibilities = [binding.value, options]
+        const targetEl = bestEl(possibilities)
+        const scrollbar = OverlayScrollbars(
+          targetEl ? document.querySelector(targetEl) : el
+        )
+        scrollbar && scrollbar.destroy()
+
+        el.dispatchEvent(new CustomEvent('unbind', { detail: el }))
+      }
+    })
+  }
+}
