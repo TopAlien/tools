@@ -1,3 +1,5 @@
+import idCard from 'idCard'
+
 const getId18Info = (infoId) => {
   if(infoId.length === 18) {
     const id18 = idCard.info(infoId)
