@@ -1,0 +1,22 @@
+const getId18Info = (infoId) => {
+  if(infoId.length === 18) {
+    const id18 = idCard.info(infoId)
+    return id18.valid ? id18: { }
+  }
+
+  return {}
+}
+
+const getUserInfoInIdCard = (infoId) => {
+  if(infoId.length === 15) {
+    const result = idCard.upgrade15To18(infoId);
+
+    if(result.code === 0) {
+      return getId18Info(result.card)
+    }
+
+    return {}
+  }
+
+  return getId18Info(infoId)
+}
