@@ -1,0 +1,2 @@
+1、pnpm install lodash-es dayjs @vueuse/core idcard vue-router@4
+2、pnpm install unocss prettier less unplugin-vue-components naive-ui -D
