@@ -105,7 +105,10 @@ export const previewMedia = async ({ src, cover, type = 'image' }) => {
   })
 }
 
-const invokeModal = ({ view, title = '添加', preset = 'card', style = { width: '1000px' }, config, ...props }) => {
+import { h } from 'vue'
+import { ElMessageBox } from 'element-plus'
+
+export const invokeModal = ({ view, title = '添加', preset = 'card', style = { width: '1000px' }, config, ...props }) => {
   return new Promise((resolve, reject) => {
     ElMessageBox({
       title,
@@ -116,10 +119,11 @@ const invokeModal = ({ view, title = '添加', preset = 'card', style = { width:
           ...props,
           onConfirm: (data) => {
             resolve(data)
-            vnode.ctx.setupState.handleAction('close')
+            console.log(vnode)
+            vnode.ctx.setupState.handleClose()
           },
           onClose: () => {
-            vnode.ctx.setupState.handleAction('close')
+            vnode.ctx.setupState.handleClose()
           }
         })
 
