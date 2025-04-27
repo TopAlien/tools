@@ -105,30 +105,26 @@ export const previewMedia = async ({ src, cover, type = 'image' }) => {
   })
 }
 
-export const invokeModal = ({
-  view,
-  title = '添加',
-  preset = 'card',
-  style = { width: '500px' },
-  config,
-  ...props
-}) => {
+const invokeModal = ({ view, title = '添加', preset = 'card', style = { width: '1000px' }, config, ...props }) => {
   return new Promise((resolve, reject) => {
-      ElMessageBox({
-        title,
-        showConfirmButton: false,
-        customStyle: { ...style, maxWidth: 'none' },
-        message: () => h(view, {
+    ElMessageBox({
+      title,
+      customStyle: { ...style, maxWidth: 'none' },
+      showConfirmButton: false,
+      message: () => {
+        const vnode = h(view, {
           ...props,
           onConfirm: (data) => {
             resolve(data)
-            modal?.destroy()
+            vnode.ctx.setupState.handleAction('close')
           },
           onClose: () => {
-            modal?.destroy()
-            reject()
+            vnode.ctx.setupState.handleAction('close')
           }
         })
-      })
+
+        return vnode
+      }
+    })
   })
 }
